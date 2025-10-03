@@ -12,14 +12,14 @@ import { Observable } from 'rxjs';
     <div *ngFor="let p of perfumes$ | async" class="card">
       <b>{{ p.name }}</b>
       <div>Ø {{ p.avgRating }} ({{ p.ratingsCount }})</div>
-      <button *ngFor="let s of [1,2,3,4,5]" (click)="rate(p.id, s)">{{ s }}★</button>
+      <button type="button" *ngFor="let s of [1,2,3,4,5]" (click)="rate(p.id, s)">{{ s }}★</button>
     </div>
   `
 })
 export class PerfumeListComponent implements OnInit {
   perfumes$!: Observable<Perfume[]>;
 
-  constructor(private service: PerfumeService) {}
+  constructor(private readonly service: PerfumeService) {}
 
   ngOnInit(): void {
     this.perfumes$ = this.service.list();
