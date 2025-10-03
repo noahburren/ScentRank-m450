@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: scentrank
+        working-directory: scentrank   # <-- dein Projektordner
     steps:
       - uses: actions/checkout@v4
 
@@ -17,8 +17,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
-          cache: "maven"
+          java-version: '17'
+          cache: 'maven'
 
       - name: Build & Test (with coverage)
         run: mvn -B clean verify
@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
-          path: scentrank/target/surefire-reports
+          path: scentrank/target/surefire-reports   # Pfad relativ zum Repo-Root
 
       - name: Upload JaCoCo HTML
         uses: actions/upload-artifact@v4
@@ -35,7 +35,9 @@ jobs:
           name: jacoco-report
           path: scentrank/target/site/jacoco
 
+      # Erster Scan nur auf Default-Branch (z. B. main), sonst jault Sonar
       - name: SonarCloud Scan
+        if: github.ref_name == 'main'
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -44,3 +46,4 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.branch.name=${{ github.ref_name }}
