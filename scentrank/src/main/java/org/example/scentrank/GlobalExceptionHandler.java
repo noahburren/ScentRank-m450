@@ -26,10 +26,8 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "bad_request", "message", ex.getMessage()));
     }
 
-    // *** WICHTIG für @Min/@Max @RequestParam in Spring Boot 3.x ***
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<Map<String, Object>> handleHandlerMethodValidation(HandlerMethodValidationException ex) {
-        // Sammle alle Fehlermeldungen (falls du mehrere Parameter validierst)
         List<String> messages = ex.getAllValidationResults().stream()
                 .flatMap(r -> r.getResolvableErrors().stream())
                 .map(err -> err.getDefaultMessage() != null ? err.getDefaultMessage() : err.toString())
