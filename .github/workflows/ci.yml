@@ -10,9 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: scentrank # dein Backend liegt in ./scentrank
+        working-directory: scentrank # dein Backend lebt hier
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # <- WICHTIG: komplette Git-History für Sonar/Blame
+
+      - name: Show clone depth (debug)
+        run: |
+          git rev-parse --is-shallow-repository || true
+          git log -1 --oneline || true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -36,8 +43,13 @@ jobs:
           name: jacoco-report
           path: scentrank/target/site/jacoco
 
-      # Sonar: zuerst sicherstellen, dass die Default-Branch (z. B. main) einmal gescannt wurde
-      # Danach kannst du auch PRs scannen – unten ist beides erlaubt.
+      # PR-Parameter für Sonar (nur wenn es ein PR ist)
+      - name: Compute Sonar PR args
+        id: sonarargs
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "args=-Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }} -Dsonar.pullrequest.base=${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+
       - name: SonarCloud Scan (main & PRs)
         if: github.ref_name == 'main' || github.event_name == 'pull_request'
         env:
@@ -50,4 +62,5 @@ jobs:
             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
             -Dsonar.organization=${SONAR_ORGANIZATION} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${SONAR_TOKEN}
+            -Dsonar.token=${SONAR_TOKEN} \
+            ${{ steps.sonarargs.outputs.args }}
