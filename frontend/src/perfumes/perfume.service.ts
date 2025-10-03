@@ -1,3 +1,4 @@
+// src/app/perfume.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -11,13 +12,16 @@ export interface Perfume {
 
 @Injectable({ providedIn: 'root' })
 export class PerfumeService {
-  constructor(private http: HttpClient) {}
+
+  private readonly base = '/api';
+
+  constructor(private readonly http: HttpClient) {}
 
   list(): Observable<Perfume[]> {
-    return this.http.get<Perfume[]>('/api/perfumes');
+    return this.http.get<Perfume[]>(`${this.base}/perfumes`);
   }
 
   rate(id: number, stars: number): Observable<Perfume> {
-    return this.http.post<Perfume>(`/api/perfumes/${id}/rate?stars=${stars}`, {});
+    return this.http.post<Perfume>(`${this.base}/perfumes/${id}/rate?stars=${stars}`, {});
   }
 }
