@@ -86,8 +86,8 @@ jobs:
       - name: Build Angular app
         run: npm run build
 
-      - name: Serve Angular app
-        run: npx http-server ./dist/frontend -p 4200 &
+      - name: Serve Angular app (SPA mode)
+        run: npx http-server ./dist/frontend -p 4200 -P http://127.0.0.1:4200? &
 
       - name: Wait for server
         run: npx wait-on http://localhost:4200
