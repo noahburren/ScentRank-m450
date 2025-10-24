@@ -3,8 +3,8 @@ import { PerfumeListComponent } from '../perfumes/perfume-list.component';
 import {AppComponent} from './app.component';
 
 export const routes: Routes = [
-  { path: '', component: AppComponent },
-  { path: 'perfumes', component: PerfumeListComponent },
+    { path: 'perfumes', component: PerfumeListComponent },
+    { path: '', component: PerfumeListComponent },
 
 ];
 
