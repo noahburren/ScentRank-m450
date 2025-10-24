@@ -2,13 +2,11 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    // 1️⃣ Intercept MUSS aktiv sein, bevor Angular lädt
-    cy.intercept('GET', '/api/perfumes', { fixture: 'perfumes.json' }).as('getPerfumes');
+    // Intercept greift jetzt auch bei http://localhost:4200/api/perfumes
+    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes.json' }).as('getPerfumes');
 
-    // 2️⃣ Seite aufrufen (Angular routed intern auf /perfumes)
     cy.visit('http://localhost:4200/perfumes');
 
-    // 3️⃣ Auf den Mock warten (max. 10s, weil CI manchmal lahm ist)
     cy.wait('@getPerfumes', { timeout: 10000 });
   });
 
@@ -32,29 +30,24 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
   });
 
   it('bewertet ein Parfum und aktualisiert die Anzeige', () => {
-    // 1️⃣ POST intercepten (Bewertung)
-    cy.intercept('POST', '/api/perfumes/1/rate?stars=5', {
+    cy.intercept('POST', '**/api/perfumes/1/rate?stars=5', {
       id: 1,
       name: 'Acqua di Parma Colonia',
       avgRating: 4.8,
       ratingsCount: 11,
     }).as('ratePerfume');
 
-    // 2️⃣ Zweiten GET abfangen (nach Bewertung)
-    cy.intercept('GET', '/api/perfumes', { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
+    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
 
-    // 3️⃣ User-Aktion simulieren
     cy.get('.perfume-card')
       .first()
       .find('.star-button')
       .contains('5★')
       .click();
 
-    // 4️⃣ Auf beide Requests warten (mit großzügigem Timeout)
     cy.wait('@ratePerfume', { timeout: 10000 });
     cy.wait('@getPerfumesUpdated', { timeout: 10000 });
 
-    // 5️⃣ Neue Werte prüfen
     cy.get('.perfume-card')
       .first()
       .find('.rating-value')
