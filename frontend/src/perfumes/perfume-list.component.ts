@@ -22,7 +22,7 @@ export class PerfumeListComponent implements OnInit {
   constructor(private readonly service: PerfumeService) {}
 
   ngOnInit(): void {
-    this.perfumes$ = this.service.list();
+    this.perfumes$   = this.service.list();
   }
 
   rate(id: number, s: number) {
