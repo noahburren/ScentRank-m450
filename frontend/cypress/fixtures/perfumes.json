@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "Acqua di Parma Colonia", "avgRating": 4.5, "ratingsCount": 10 },
+  { "id": 2, "name": "Xerjoff Naxos", "avgRating": 3.0, "ratingsCount": 5 },
+  { "id": 3, "name": "Dior Sauvage", "avgRating": 0, "ratingsCount": 0 }
+]
