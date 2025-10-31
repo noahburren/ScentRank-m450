@@ -2,9 +2,12 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes.json' }).as('getPerfumes');
+    // Match the exact URL that the Angular app will call
+    cy.intercept('GET', 'http://localhost:4200/api/perfumes', {
+      fixture: 'perfumes.json'
+    }).as('getPerfumes');
 
-    cy.visit('http://localhost:4200'); // gleiche Domain wie im CI-Server
+    cy.visit('http://localhost:4200');
 
     cy.wait('@getPerfumes', { timeout: 15000 });
   });
@@ -28,14 +31,16 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
   });
 
   it('bewertet ein Parfum und aktualisiert die Anzeige', () => {
-    cy.intercept('POST', '**/api/perfumes/1/rate?stars=5', {
+    cy.intercept('POST', 'http://localhost:4200/api/perfumes/1/rate?stars=5', {
       id: 1,
       name: 'Acqua di Parma Colonia',
       avgRating: 4.8,
       ratingsCount: 11,
     }).as('ratePerfume');
 
-    cy.intercept('GET', /\/api\/perfumes(\?.*)?$/, { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
+    cy.intercept('GET', 'http://localhost:4200/api/perfumes', {
+      fixture: 'perfumes_after_rating.json'
+    }).as('getPerfumesUpdated');
 
     cy.get('.perfume-card')
       .first()
