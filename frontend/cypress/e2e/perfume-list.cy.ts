@@ -2,12 +2,11 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    // Intercept für das Laden der Parfumliste – robust für jede URL-Variante
-    cy.intercept('GET', '**/api/perfumes*', { fixture: 'perfumes.json' }).as('getPerfumes');
+    // Intercept für jede Host-Variante (127.0.0.1 ODER localhost)
+    cy.intercept('GET', /\/api\/perfumes(\?.*)?$/, { fixture: 'perfumes.json' }).as('getPerfumes');
 
-    cy.visit('http://localhost:4200');
+    cy.visit('http://127.0.0.1:4200'); // gleiche Domain wie im CI-Server
 
-    // Warten bis die Mock-Daten geladen sind
     cy.wait('@getPerfumes', { timeout: 15000 });
   });
 
@@ -19,7 +18,6 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
   });
 
   it('zeigt die korrekten Ratings an', () => {
-    // Warte, bis kein Platzhalter mehr angezeigt wird
     cy.get('.perfume-card .rating-value', { timeout: 10000 })
       .first()
       .should('not.contain', '—')
@@ -27,12 +25,10 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
 
     cy.get('.perfume-card').eq(1)
       .find('.rating-value')
-      .should('not.contain', '—')
-      .and('contain', '3.0');
+      .should('contain', '3.0');
   });
 
   it('bewertet ein Parfum und aktualisiert die Anzeige', () => {
-    // POST-Intercept: Benutzer bewertet Parfum #1 mit 5 Sternen
     cy.intercept('POST', '**/api/perfumes/1/rate?stars=5', {
       id: 1,
       name: 'Acqua di Parma Colonia',
@@ -40,10 +36,8 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
       ratingsCount: 11,
     }).as('ratePerfume');
 
-    // Nach Bewertung neue GET-Antwort simulieren
-    cy.intercept('GET', '**/api/perfumes*', { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
+    cy.intercept('GET', /\/api\/perfumes(\?.*)?$/, { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
 
-    // Bewertung auslösen
     cy.get('.perfume-card')
       .first()
       .find('.star-button')
@@ -53,15 +47,7 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
     cy.wait('@ratePerfume', { timeout: 10000 });
     cy.wait('@getPerfumesUpdated', { timeout: 10000 });
 
-    // Prüfen, ob sich Rating & Anzahl Bewertungen aktualisiert haben
-    cy.get('.perfume-card')
-      .first()
-      .find('.rating-value')
-      .should('contain', '4.8');
-
-    cy.get('.perfume-card')
-      .first()
-      .find('.rating-count')
-      .should('contain', '11 Bewertung');
+    cy.get('.perfume-card').first().find('.rating-value').should('contain', '4.8');
+    cy.get('.perfume-card').first().find('.rating-count').should('contain', '11 Bewertung');
   });
 });
