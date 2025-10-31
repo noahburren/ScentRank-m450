@@ -86,13 +86,11 @@ jobs:
       - name: Build Angular app
         run: npm run build
 
-      - name: Serve Angular app with proxy
-        run: npx http-server ./dist/frontend -p 4200 --proxy http://localhost:4200? &
-      - name: Wait for server
-        run: npx wait-on http://localhost:4200
+      - name: Serve Angular app
+        run: npx http-server ./dist/frontend -p 4200 &
 
       - name: Run Cypress tests
-        run: npm run test:ui
+        run: npx wait-on http://localhost:4200 && npm run test:ui
 
       - name: Upload Cypress screenshots/videos
         if: failure()

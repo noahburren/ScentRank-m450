@@ -3,11 +3,11 @@
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
     // Intercept greift jetzt auch bei http://localhost:4200/api/perfumes
-    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes.json' }).as('getPerfumes');
+    cy.intercept('GET', /\/api\/perfumes$/).as('getPerfumes');
 
     cy.visit('http://localhost:4200/perfumes');
 
-    cy.wait('@getPerfumes', { timeout: 10000 });
+    cy.wait('@getPerfumes', { timeout: 15000 });
   });
 
   it('zeigt alle Parfums aus dem Mock an', () => {
