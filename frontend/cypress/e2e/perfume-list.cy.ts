@@ -2,10 +2,9 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    // Intercept für jede Host-Variante (127.0.0.1 ODER localhost)
     cy.intercept('GET', /\/api\/perfumes(\?.*)?$/, { fixture: 'perfumes.json' }).as('getPerfumes');
 
-    cy.visit('http://127.0.0.1:4200'); // gleiche Domain wie im CI-Server
+    cy.visit('http://localhost:4200'); // gleiche Domain wie im CI-Server
 
     cy.wait('@getPerfumes', { timeout: 15000 });
   });
