@@ -13,7 +13,7 @@ export interface Perfume {
 @Injectable({ providedIn: 'root' })
 export class PerfumeService {
 
-  private readonly base = '/api';
+  private readonly base = `${globalThis.location.origin}/api`;
 
   constructor(private readonly http: HttpClient) {}
 
