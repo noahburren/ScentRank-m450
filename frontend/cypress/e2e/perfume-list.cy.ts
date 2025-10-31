@@ -2,11 +2,12 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    // Intercept greift jetzt auch bei http://localhost:4200/api/perfumes
-    cy.intercept('GET', /\/api\/perfumes$/).as('getPerfumes');
+    // Intercept für das Laden der Parfumliste – robust für jede URL-Variante
+    cy.intercept('GET', '**/api/perfumes*', { fixture: 'perfumes.json' }).as('getPerfumes');
 
     cy.visit('http://localhost:4200');
 
+    // Warten bis die Mock-Daten geladen sind
     cy.wait('@getPerfumes', { timeout: 15000 });
   });
 
@@ -18,18 +19,20 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
   });
 
   it('zeigt die korrekten Ratings an', () => {
-    cy.get('.perfume-card').eq(0)
-      .find('.rating-value')
-      .invoke('text')
-      .should('contain', '4.5');
+    // Warte, bis kein Platzhalter mehr angezeigt wird
+    cy.get('.perfume-card .rating-value', { timeout: 10000 })
+      .first()
+      .should('not.contain', '—')
+      .and('contain', '4.5');
 
     cy.get('.perfume-card').eq(1)
       .find('.rating-value')
-      .invoke('text')
-      .should('contain', '3.0');
+      .should('not.contain', '—')
+      .and('contain', '3.0');
   });
 
   it('bewertet ein Parfum und aktualisiert die Anzeige', () => {
+    // POST-Intercept: Benutzer bewertet Parfum #1 mit 5 Sternen
     cy.intercept('POST', '**/api/perfumes/1/rate?stars=5', {
       id: 1,
       name: 'Acqua di Parma Colonia',
@@ -37,8 +40,10 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
       ratingsCount: 11,
     }).as('ratePerfume');
 
-    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
+    // Nach Bewertung neue GET-Antwort simulieren
+    cy.intercept('GET', '**/api/perfumes*', { fixture: 'perfumes_after_rating.json' }).as('getPerfumesUpdated');
 
+    // Bewertung auslösen
     cy.get('.perfume-card')
       .first()
       .find('.star-button')
@@ -48,6 +53,7 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
     cy.wait('@ratePerfume', { timeout: 10000 });
     cy.wait('@getPerfumesUpdated', { timeout: 10000 });
 
+    // Prüfen, ob sich Rating & Anzahl Bewertungen aktualisiert haben
     cy.get('.perfume-card')
       .first()
       .find('.rating-value')
