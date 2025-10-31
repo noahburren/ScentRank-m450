@@ -2,7 +2,7 @@
 
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
-    cy.intercept('GET', /\/api\/perfumes(\?.*)?$/, { fixture: 'perfumes.json' }).as('getPerfumes');
+    cy.intercept('GET', '**/api/perfumes', { fixture: 'perfumes.json' }).as('getPerfumes');
 
     cy.visit('http://localhost:4200'); // gleiche Domain wie im CI-Server
 

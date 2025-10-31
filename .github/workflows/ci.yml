@@ -87,7 +87,7 @@ jobs:
         run: npm run build
 
       - name: Serve Angular app
-        run: npx http-server ./dist/frontend -p 4200 &
+        run: npx http-server ./dist/frontend -p 4200 --hostname localhost &
 
       - name: Run Cypress tests
         run: npx wait-on http://localhost:4200 && npm run test:ui
