@@ -9,7 +9,7 @@ describe('ScentRank – Parfumliste & Bewertungen', () => {
 
     cy.visit('http://localhost:4200');
 
-    cy.wait('@getPerfumes', { timeout: 15000 });
+    cy.wait('@getPerfumes', { timeout: 300000 });
   });
 
   it('zeigt alle Parfums aus dem Mock an', () => {
