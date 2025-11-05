@@ -3,7 +3,7 @@
 describe('ScentRank – Parfumliste & Bewertungen', () => {
   beforeEach(() => {
     // Match the exact URL that the Angular app will call
-    cy.intercept('GET', 'http://localhost:4200/api/perfumes', {
+    cy.intercept('GET', '/api/perfumes', {
       fixture: 'perfumes.json'
     }).as('getPerfumes');
 
